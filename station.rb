@@ -17,4 +17,12 @@ class Station
   def trains_by_type(type)
     trains.filter { |train| train.type == type }
   end
+
+  def to_s
+    "Станция #{name}"
+  end
+
+  private
+
+  attr_reader :name
 end

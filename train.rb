@@ -1,68 +1,82 @@
 class Train
   attr_accessor :speed, :type
-  attr_reader :wagon_count, :station
+  attr_reader :station, :wagons
 
-  def initialize(number, type, wagon_count)
+  def initialize(number, type)
     @number = number
     @type = type
-    @wagon_count = wagon_count
     @speed = 0
+    @wagons = []
+  end
+
+  def standart_speed
   end
 
   def stop
     self.speed = 0
   end
 
-  def add_wagon
-    self.wagon_count += 1 if speed.zero?
+  def speed_up
+    self.speed = standart_speed
+  end
+
+  def add_wagon(wagon)
+    wagons << wagon if speed.zero? && wagon.type == type
   end
 
   def subtract_wagon
-    self.wagon_count -= 1 if speed.zero? && wagon_count.positive?
+    wagons.pop if speed.zero? && wagons.any?
   end
 
   def route=(route)
     @route = route
     self.station = route.stations.first
-    self.station_num = 0
     station.accept_train(self)
   end
 
   def next_station
-    route.stations.at(station_num + 1)
+    route.stations.at(route.station_index(station).next)
   end
 
   def prev_station
-    return nil if (station_num - 1).negative?
+    return unless route.any_station_before?(station)
 
-    route.stations.at(station_num - 1)
+    route.stations.at(route.station_index(station).pred)
   end
 
   def go_forward
-    return nil if route.nil? || next_station.nil?
+    return if route.nil? || next_station.nil?
 
-    self.speed = 10
+    speed_up
     station.dispatch_train(self)
     self.station = next_station
-    self.station_num += 1
     station.accept_train(self)
     stop
   end
 
   def go_backward
-    return nil if route.nil? || prev_station.nil?
+    return if route.nil? || prev_station.nil?
 
-    self.speed = 10
+    speed_up
     station.dispatch_train(self)
     self.station = prev_station
-    self.station_num -= 1
     station.accept_train(self)
     stop
   end
 
-  private
+  def to_s
+    type_name = case type
+                  when :cargo then "Грузовой"
+                  when :passenger then "Пассажирский"
+                end
+    info = "#{type_name} поезд №#{number}. #{wagons.size} вагон."
+    info += "\nМаршрут: #{route}." if route
+    info += " На станции: #{station}" if station
+    info
+  end
 
-  attr_reader :route
-  attr_writer :wagon_count, :station
-  attr_accessor :station_num
+  protected
+
+  attr_reader :route, :number
+  attr_writer :station
 end

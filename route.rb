@@ -10,6 +10,18 @@ class Route
   end
 
   def delete_station(station)
-    stations.delete(station)
+    stations.delete(station) if station.trains.empty?
+  end
+
+  def station_index(station)
+    stations.index(station)
+  end
+
+  def any_station_before?(station)
+    !station_index(station).pred.negative?
+  end
+
+  def to_s
+    "Маршрут #{stations.join(' - ')}"
   end
 end
