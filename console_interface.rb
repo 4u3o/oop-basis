@@ -16,14 +16,6 @@ class ConsoleInterface
     end
   end
 
-  def create(menu)
-    menu.map { |k, v| "#{k} - #{v[:text]}" }.join("\n")
-  end
-
-  def input
-    gets.chomp
-  end
-
   private
 
   NEED_STATIONS_FOR_ROUTE = 2
@@ -81,6 +73,14 @@ class ConsoleInterface
       'f' => {text: 'Переместить вперед', action: :go_forward},
       'b' => {text: 'Переместить назад', action: :go_backward}
     }
+  end
+
+  def create(menu)
+    menu.map { |k, v| "#{k} - #{v[:text]}" }.join("\n")
+  end
+
+  def input
+    gets.chomp
   end
 
   def send_action(command, menu, *args)
