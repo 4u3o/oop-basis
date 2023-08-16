@@ -1,23 +1,15 @@
 class Train
-  attr_accessor :speed, :type
-  attr_reader :station, :wagons
+  attr_accessor :speed
+  attr_reader :station, :wagons, :type
 
-  def initialize(number, type)
+  def initialize(number)
     @number = number
-    @type = type
     @speed = 0
     @wagons = []
   end
 
-  def standart_speed
-  end
-
   def stop
     self.speed = 0
-  end
-
-  def speed_up
-    self.speed = standart_speed
   end
 
   def add_wagon(wagon)
@@ -47,7 +39,6 @@ class Train
   def go_forward
     return if route.nil? || next_station.nil?
 
-    speed_up
     station.dispatch_train(self)
     self.station = next_station
     station.accept_train(self)
@@ -57,22 +48,10 @@ class Train
   def go_backward
     return if route.nil? || prev_station.nil?
 
-    speed_up
     station.dispatch_train(self)
     self.station = prev_station
     station.accept_train(self)
     stop
-  end
-
-  def to_s
-    type_name = case type
-                  when :cargo then "Грузовой"
-                  when :passenger then "Пассажирский"
-                end
-    info = "#{type_name} поезд №#{number}. #{wagons.size} вагон."
-    info += "\nМаршрут: #{route}." if route
-    info += " На станции: #{station}" if station
-    info
   end
 
   protected

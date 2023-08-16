@@ -20,8 +20,4 @@ class Route
   def any_station_before?(station)
     !station_index(station).pred.negative?
   end
-
-  def to_s
-    "Маршрут #{stations.join(' - ')}"
-  end
 end
