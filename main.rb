@@ -1,12 +1,12 @@
-require_relative 'train'
-require_relative 'cargo_train'
-require_relative 'passenger_train'
-require_relative 'wagon'
-require_relative 'cargo_wagon'
-require_relative 'passenger_wagon'
-require_relative 'station'
-require_relative 'route'
-require_relative 'console_interface'
+require_relative 'lib/train'
+require_relative 'lib/cargo_train'
+require_relative 'lib/passenger_train'
+require_relative 'lib/wagon'
+require_relative 'lib/cargo_wagon'
+require_relative 'lib/passenger_wagon'
+require_relative 'lib/station'
+require_relative 'lib/route'
+require_relative 'lib/console_interface'
 
 cli = ConsoleInterface.new
 cli.start

@@ -1,4 +1,6 @@
 class Train
+  include Nameable
+
   attr_accessor :speed
   attr_reader :station, :wagons, :type
 
