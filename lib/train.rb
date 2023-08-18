@@ -2,12 +2,21 @@ class Train
   include Nameable
 
   attr_accessor :speed
-  attr_reader :station, :wagons, :type
+  attr_reader :station, :wagons, :type, :number
+
+  @@trains = []
+
+  class << self
+    def find(number)
+      @@trains.select { |train| train.number == number }.first
+    end
+  end
 
   def initialize(number)
     @number = number
     @speed = 0
     @wagons = []
+    @@trains << self
   end
 
   def stop
@@ -58,6 +67,6 @@ class Train
 
   protected
 
-  attr_reader :route, :number
+  attr_reader :route
   attr_writer :station
 end
