@@ -1,7 +1,10 @@
 class Station
+  include InstanceCounter
+
   attr_reader :trains
 
   @stations = []
+  @counter = 0
 
   class << self
     attr_reader :stations
@@ -12,6 +15,8 @@ class Station
   end
 
   def initialize(name)
+    register_instance
+
     @name = name
     @trains = []
     self.class.stations << self

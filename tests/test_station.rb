@@ -1,0 +1,16 @@
+require_relative '../lib/instance_counter'
+require_relative '../lib/station'
+require 'test/unit'
+
+class TestStation < Test::Unit::TestCase
+  def test_all
+    station = Station.new('name')
+
+    assert_true(Station.all.any?)
+    assert_equal(Station.all, [station])
+  end
+
+  def test_instance_counter
+    assert_equal(1, Station.instances)
+  end
+end

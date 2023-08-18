@@ -1,10 +1,12 @@
 class Train
   include Nameable
+  include InstanceCounter
 
   attr_accessor :speed
   attr_reader :station, :wagons, :type, :number
 
   @@trains = []
+  @counter = 0
 
   class << self
     def find(number)
@@ -13,6 +15,8 @@ class Train
   end
 
   def initialize(number)
+    register_instance
+
     @number = number
     @speed = 0
     @wagons = []
