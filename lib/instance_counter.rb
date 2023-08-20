@@ -5,6 +5,8 @@ module InstanceCounter
   end
 
   module ClassMethods
+    # смущает, что .counter наружу торчит, а если зделать protected, то
+    # у "наследника" NoMethodError
     attr_accessor :counter
 
     def instances

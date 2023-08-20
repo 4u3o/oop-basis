@@ -13,4 +13,10 @@ class TestStation < Test::Unit::TestCase
   def test_instance_counter
     assert_equal(1, Station.instances)
   end
+
+  def test_name_validate
+    assert_raise(ArgumentError) do
+      Station.new('')
+    end
+  end
 end

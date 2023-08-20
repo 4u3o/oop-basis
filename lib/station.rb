@@ -7,10 +7,8 @@ class Station
   @counter = 0
 
   class << self
-    attr_reader :stations
-
     def all
-      stations
+      @stations
     end
   end
 
@@ -19,7 +17,10 @@ class Station
 
     @name = name
     @trains = []
-    self.class.stations << self
+
+    validate!
+
+    self.class.all << self
   end
 
   def accept_train(train)
@@ -34,7 +35,18 @@ class Station
     trains.filter { |train| train.type == type }
   end
 
+  def valid?
+    validate!
+    true
+  rescue ArgumentError
+    false
+  end
+
   private
 
   attr_reader :name
+
+  def validate!
+    raise ArgumentError, 'Имя не может быть пустым' if name.empty?
+  end
 end

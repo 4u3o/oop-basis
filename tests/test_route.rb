@@ -11,4 +11,10 @@ class TestRoute < Test::Unit::TestCase
 
     assert_equal(1, Route.instances)
   end
+
+  def test_stations_validate
+    assert_raise(ArgumentError) do
+      Route.new(Station.all.first, Station.all.first)
+    end
+  end
 end

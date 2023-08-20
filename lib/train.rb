@@ -15,12 +15,14 @@ class Train
   end
 
   def initialize(number)
-    register_instance
-
     @number = number
     @speed = 0
     @wagons = []
+
+    validate!
+
     @@trains << self
+    register_instance
   end
 
   def stop
@@ -69,8 +71,21 @@ class Train
     stop
   end
 
+  def valid?
+    validate!
+    true
+  rescue ArgumentError
+    false
+  end
+
   protected
+
+  NUMBER_FORMAT = /^[a-zа-я0-9]{3}-?[a-zа-я0-9]{2}$/i
 
   attr_reader :route
   attr_writer :station
+
+  def validate!
+    raise ArgumentError, 'Неверный формат номера' if number !~ NUMBER_FORMAT
+  end
 end

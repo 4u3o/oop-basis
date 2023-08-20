@@ -6,9 +6,11 @@ class Route
   @counter = 0
 
   def initialize(start, finish)
-    register_instance
-
     @stations = [start, finish]
+
+    validate!
+
+    register_instance
   end
 
   def add_station(station)
@@ -25,5 +27,18 @@ class Route
 
   def any_station_before?(station)
     !station_index(station).pred.negative?
+  end
+
+  def valid?
+    validate!
+    true
+  rescue ArgumentError
+    false
+  end
+
+  private
+
+  def validate!
+    raise ArgumentError, 'Станции должны быть разными' if stations.first == stations.last
   end
 end
