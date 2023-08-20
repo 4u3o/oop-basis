@@ -124,7 +124,12 @@ class ConsoleInterface
 
   def create_station
     puts 'Введите название станции'
-    stations << Station.new(input.capitalize)
+    station = Station.new(input.capitalize)
+    stations << station
+    puts "Станция #{station.inspect} успешно создана" if station.valid?
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 
   def show_trains
@@ -137,21 +142,30 @@ class ConsoleInterface
   end
 
   def create_train
-    puts 'Введите номер поезда'
+    puts 'Введите номер поезда в формате "а12-z1" или "а12я1"'
     number = input
     puts "Введите тип поезда:\n#{create(type_menu)}"
     command = input
     return unless type_menu.key?(command)
 
-    send_action(command, type_menu, number)
+    train = send_action(command, type_menu, number)
+
+    puts "Поезд #{train.inspect} успешно создан" if train.valid?
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 
   def create_cargo_train(number)
-    trains << CargoTrain.new(number)
+    train = CargoTrain.new(number)
+    trains << train
+    train
   end
 
   def create_passenger_train(number)
-    trains << PassengerTrain.new(number)
+    train = PassengerTrain.new(number)
+    trains << train
+    train
   end
 
   def create_route
@@ -161,7 +175,12 @@ class ConsoleInterface
     show(stations)
 
     start_index, finish_index = input.split.map(&:to_i)
-    routes << Route.new(stations[start_index], stations[finish_index])
+    route = Route.new(stations[start_index], stations[finish_index])
+    routes << route
+    puts "Маршрут #{route.inspect} успешно создан" if route.valid?
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 
   def add_station(route)
