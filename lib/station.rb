@@ -35,6 +35,10 @@ class Station
     trains.filter { |train| train.type == type }
   end
 
+  def each_train
+    trains.each { |train| yield train }
+  end
+
   def valid?
     validate!
     true
