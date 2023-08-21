@@ -43,16 +43,6 @@ class Train
     station.accept_train(self)
   end
 
-  def next_station
-    route.stations.at(route.station_index(station).next)
-  end
-
-  def prev_station
-    return unless route.any_station_before?(station)
-
-    route.stations.at(route.station_index(station).pred)
-  end
-
   def go_forward
     return if route.nil? || next_station.nil?
 
@@ -71,6 +61,10 @@ class Train
     stop
   end
 
+  def each_wagon
+    wagons.each { |wagon| yield wagon }
+  end
+
   def valid?
     validate!
     true
@@ -86,6 +80,16 @@ class Train
   attr_writer :station
 
   def validate!
-    raise ArgumentError, 'Неверный формат номера' if number !~ NUMBER_FORMAT
+    raise ArgumentError, 'Неверный формат' if number !~ NUMBER_FORMAT
+  end
+
+  def next_station
+    route.stations.at(route.index(station).next)
+  end
+
+  def prev_station
+    return unless route.any_station_before?(station)
+
+    route.stations.at(route.index(station).pred)
   end
 end
