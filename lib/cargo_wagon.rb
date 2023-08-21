@@ -1,5 +1,5 @@
 class CargoWagon < Wagon
-  TYPE = 'Грузовой'
+  TYPE = 'грузовой'
   UNIT = 'м3'
 
   def initialize(total_place)
@@ -8,7 +8,8 @@ class CargoWagon < Wagon
   end
 
   def take_place(place)
-    return if free_place < place
+    # мб стоит обозначить как бенг метол?
+    raise ArgumentError, 'Не достаточно свободного места' if free_place < place
 
     self.used_place += place
   end

@@ -53,8 +53,8 @@ class ConsoleInterface
 
   def type_menu
     {
-      '1' => {text: 'Пассажирский', action: :create_passenger_train},
-      '2' => {text: 'Грузовой', action: :create_cargo_train}
+      '1' => {text: 'Пассажирский', class: PassengerTrain},
+      '2' => {text: 'Грузовой', class: CargoTrain}
     }
   end
 
@@ -70,15 +70,11 @@ class ConsoleInterface
       '+' => {text: 'Добавить вагон', action: :add_wagon},
       '-' => {text: 'Удалить вагон', action: :delete_wagon},
       '?' => {text: 'Список вагонов', action: :show_wagons},
-      '@' => {text: 'Занять вагон', action: :take_wagon},
+      '@' => {text: 'Занять вагон', action: :use_wagon},
       '$' => {text: 'Назначить маршрут', action: :add_route},
       'f' => {text: 'Переместить вперед', action: :go_forward},
       'b' => {text: 'Переместить назад', action: :go_backward}
     }
-  end
-
-  def wagon_info
-    {cargo: :cargo_wagon_info, passenger: :passenger_wagon_info}
   end
 
   def create(menu)
@@ -99,6 +95,7 @@ class ConsoleInterface
 
   def pick_obj(objs)
     show(objs)
+    puts 'Введите номер'
     index = input.to_i
     return unless (0...objs.size).include?(index)
 
@@ -154,24 +151,12 @@ class ConsoleInterface
     command = input
     return unless type_menu.key?(command)
 
-    train = send_action(command, type_menu, number)
+    train = type_menu.dig(command, :class).new(number)
 
     puts "Поезд #{train.inspect} успешно создан" if train.valid?
   rescue ArgumentError => e
     puts e.message
     retry
-  end
-
-  def create_cargo_train(number)
-    train = CargoTrain.new(number)
-    trains << train
-    train
-  end
-
-  def create_passenger_train(number)
-    train = PassengerTrain.new(number)
-    trains << train
-    train
   end
 
   def create_route
@@ -226,8 +211,10 @@ class ConsoleInterface
 
   def add_wagon(train)
     wagon = case train.type
-            when :cargo then create_cargo_wagon
-            when :passenger then create_passenger_wagon
+            when :cargo
+              create_wagon('Введите объем вагона', CargoWagon)
+            when :passenger
+              create_wagon('Введите количество мест', PassengerWagon)
             end
     train.add_wagon(wagon)
   end
@@ -237,7 +224,7 @@ class ConsoleInterface
   end
 
   def add_route(train)
-    train.route = pick_obj(routes)
+    train.route = pick_obj(routes) if routes.any?
   end
 
   def go_forward(train)
@@ -248,22 +235,11 @@ class ConsoleInterface
     train.go_backward
   end
 
-  def create_cargo_wagon
-    puts 'Введите объем вагона'
-    seats_total = input.to_i
-    wagon = CargoWagon.new(seats_total)
-    puts "Вагон #{wagon.inspect} успешно создан"
-    wagon
-  rescue ArgumentError => e
-    puts e.error
-    retry
-  end
-
-  def create_passenger_wagon
-    puts 'Введите количество мест'
-    volume_total = input.to_i
-    wagon = PassengerWagon.new(volume_total)
-    puts "Вагон #{wagon.inspect} успешно создан"
+  def create_wagon(space_prompt, typeclass)
+    puts space_prompt
+    space = input.to_i
+    wagon = typeclass.new(space)
+    puts "Создан новый вагон: #{wagon_info(wagon)}"
     wagon
   rescue ArgumentError => e
     puts e.error
@@ -271,56 +247,46 @@ class ConsoleInterface
   end
 
   def train_info(train)
-    type = {cargo: 'Грузовой', passenger: 'Пассажирский'}[train.type]
-    "#{train.number}, #{type}, #{train.wagons.size} вагонов"
+    "#{train.number}, #{train.class::TYPE}, #{train.wagons.size} вагонов"
   end
 
-  def passenger_wagon_info(wagon)
-    "Пассажирский, свободно #{wagon.seats_free}, занято #{wagon.seats_taken} мест"
-  end
-
-  def cargo_wagon_info(wagon)
-    "Грузовой, свободно #{wagon.volume_free}, занято #{wagon.volume_taken} объема"
+  def wagon_info(wagon)
+    "#{wagon.class::TYPE}, свободно #{wagon.free_place}, занято #{wagon.used_place} #{wagon.class::UNIT}"
   end
 
   def show_wagons(train)
     index = 0
     train.each_wagon do |wagon|
-      puts "#{index} - #{send(wagon_info[wagon.type], wagon)}"
+      puts "#{index} - #{wagon_info(wagon)}"
       index += 1
     end
   end
 
-  def take_wagon(train)
-    return puts 'Выгонов нет' if train.wagons.empty?
+  def use_wagon(train)
+    wagon = pick_obj(train.wagons)
 
-    show_wagons(train)
-
-    puts 'Введите номер вагона'
-    number = input.to_i
-    return take_wagon(train) if number > train.wagons.size || number.negative?
-
-    wagon = train.wagons.at(number)
-    send({cargo: :take_volume, passenger: :take_seat}[train.type], wagon)
+    case wagon.type
+    when :cargo then take_volume(wagon)
+    when :passenger then take_seat(wagon)
+    end
   end
 
   def take_seat(wagon)
-    return puts 'Мест нет' if wagon.seats_free.zero?
-
-    wagon.take_seat
+    wagon.take_place
     puts 'Место успешно занято'
+  rescue ArgumentError => e
+    puts e.message
   end
 
   def take_volume(wagon)
-    puts 'Введите занимаемый объем'
+    puts "Свободно #{wagon.free_place}#{wagon.class::UNIT}. Введите нужный объем"
     volume = input.to_i
 
-    if volume > wagon.volume_free
-      puts 'В вагоне нет столько места'
-      return take_volume(wagon)
-    end
+    wagon.take_place(volume)
 
-    wagon.take_volume(volume)
     puts 'Объем успешно занят'
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 end

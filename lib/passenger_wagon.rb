@@ -1,5 +1,5 @@
 class PassengerWagon < Wagon
-  TYPE = 'Пассажирский'
+  TYPE = 'пассажирский'
   UNIT = 'место'
 
   def initialize(total_place)
@@ -8,7 +8,7 @@ class PassengerWagon < Wagon
   end
 
   def take_place
-    return if free_place.zero?
+    raise ArgumentError, 'Нет свободных мест' if free_place.zero?
 
     self.used_place += 1
   end
