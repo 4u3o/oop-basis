@@ -1,6 +1,8 @@
 class Route
   include InstanceCounter
 
+  ADDING_INDEX = -2
+
   attr_reader :stations
 
   @counter = 0
@@ -14,19 +16,19 @@ class Route
   end
 
   def add_station(station)
-    stations.insert(-2, station)
+    stations.insert(ADDING_INDEX, station)
   end
 
   def delete_station(station)
     stations.delete(station) if station.trains.empty?
   end
 
-  def station_index(station)
+  def index(station)
     stations.index(station)
   end
 
   def any_station_before?(station)
-    !station_index(station).pred.negative?
+    !index(station).pred.negative?
   end
 
   def valid?

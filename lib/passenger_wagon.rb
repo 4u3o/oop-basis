@@ -14,4 +14,9 @@ class PassengerWagon < Wagon
   def take_seat
     self.seats_taken += 1
   end
+
+  private
+
+  attr_reader :seats_total
+  attr_writer :seats_taken
 end
