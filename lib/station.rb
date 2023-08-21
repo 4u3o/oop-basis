@@ -1,5 +1,6 @@
 class Station
   include InstanceCounter
+  include Validateable
 
   attr_reader :trains
 
@@ -37,13 +38,6 @@ class Station
 
   def each_train
     trains.each { |train| yield train }
-  end
-
-  def valid?
-    validate!
-    true
-  rescue ArgumentError
-    false
   end
 
   private

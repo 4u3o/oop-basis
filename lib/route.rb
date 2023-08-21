@@ -1,5 +1,6 @@
 class Route
   include InstanceCounter
+  include Validateable
 
   ADDING_INDEX = -2
 
@@ -29,13 +30,6 @@ class Route
 
   def any_station_before?(station)
     !index(station).pred.negative?
-  end
-
-  def valid?
-    validate!
-    true
-  rescue ArgumentError
-    false
   end
 
   private

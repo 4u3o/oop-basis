@@ -1,6 +1,7 @@
 class Train
   include Nameable
   include InstanceCounter
+  include Validateable
 
   attr_accessor :speed
   attr_reader :station, :wagons, :type, :number
@@ -63,13 +64,6 @@ class Train
 
   def each_wagon
     wagons.each { |wagon| yield wagon }
-  end
-
-  def valid?
-    validate!
-    true
-  rescue ArgumentError
-    false
   end
 
   protected
