@@ -1,22 +1,15 @@
 class PassengerWagon < Wagon
-  attr_reader :seats_taken
+  TYPE = 'Пассажирский'
+  UNIT = 'место'
 
-  def initialize(seats_total)
+  def initialize(total_place)
     @type = :passenger
-    @seats_total = seats_total
-    @seats_taken = 0
+    super
   end
 
-  def seats_free
-    seats_total - seats_taken
+  def take_place
+    return if free_place.zero?
+
+    self.used_place += 1
   end
-
-  def take_seat
-    self.seats_taken += 1
-  end
-
-  private
-
-  attr_reader :seats_total
-  attr_writer :seats_taken
 end
