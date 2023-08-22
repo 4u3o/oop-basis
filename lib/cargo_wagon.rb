@@ -8,7 +8,6 @@ class CargoWagon < Wagon
   end
 
   def take_place(place)
-    # мб стоит обозначить как бенг метол?
     raise ArgumentError, 'Не достаточно свободного места' if free_place < place
 
     self.used_place += place
