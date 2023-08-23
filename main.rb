@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'lib/validateable'
 require_relative 'lib/instance_counter'
 require_relative 'lib/nameable'

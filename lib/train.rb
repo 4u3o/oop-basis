@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Train
   include Nameable
   include InstanceCounter
@@ -11,7 +13,7 @@ class Train
 
   class << self
     def find(number)
-      @@trains.select { |train| train.number == number }.first
+      @@trains.detect { |train| train.number == number }
     end
   end
 
@@ -62,8 +64,8 @@ class Train
     stop
   end
 
-  def each_wagon
-    wagons.each { |wagon| yield wagon }
+  def each_wagon(&block)
+    wagons.each { |wagon| block.call(wagon) }
   end
 
   protected

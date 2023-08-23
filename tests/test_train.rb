@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/nameable'
 require_relative '../lib/validateable'
 require_relative '../lib/instance_counter'
@@ -32,19 +34,15 @@ class TestTrain < Test::Unit::TestCase
   end
 
   def test_number_validate
-    valid_numbers = ['123-fm', '12345', 'sdf12', 's23-1d']
-    invalid_numbers = ['12-d32', 'ds22', 's2_12', '', 'asd-13a', 'ads1-qw']
+    valid_numbers = %w[123-fm 12345 sdf12 s23-1d]
+    invalid_numbers = %w[12-d32 ds22 s2_12 asd-13a ads1-qw]
 
     assert_nothing_raised do
-      valid_numbers.each do |number|
-        Train.new(number)
-      end
+      valid_numbers.each { |number| Train.new(number) }
     end
 
     assert_raise(ArgumentError) do
-      invalid_numbers.each do |number|
-        Train.new(number)
-      end
+      invalid_numbers.each { |number| Train.new(number) }
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/nameable'
 require_relative '../lib/wagon'
 require_relative '../lib/passenger_wagon'

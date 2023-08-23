@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CargoWagon < Wagon
   TYPE = 'грузовой'
   UNIT = 'м3'

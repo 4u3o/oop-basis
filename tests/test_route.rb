@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/instance_counter'
 require_relative '../lib/station'
 require_relative '../lib/route'
@@ -5,7 +7,7 @@ require 'test/unit'
 
 class TestRoute < Test::Unit::TestCase
   def test_instance_counter
-    2.times.with_index { |i| Station.new("Станция #{i}") }
+    2.times { |i| Station.new("Станция #{i}") }
 
     Route.new(*Station.all)
 

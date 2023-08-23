@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ConsoleInterface
   def initialize
     @stations = []
@@ -51,7 +53,7 @@ class ConsoleInterface
     }
   end
 
-  def type_menu
+  def train_type_menu
     {
       '1' => {text: 'Пассажирский', class: PassengerTrain},
       '2' => {text: 'Грузовой', class: CargoTrain}
@@ -77,11 +79,23 @@ class ConsoleInterface
     }
   end
 
+  def create_wagon_types
+    {
+      cargo: [CargoWagon, 'Введите объем вагона'],
+      passenger: [PassengerWagon, 'Введите количество мест']
+    }
+  end
+
+  def use_wagon_actions_by
+    {cargo: :take_volume, passenger: :take_seat}
+  end
+
   def create(menu)
     menu.map { |k, v| "#{k} - #{v[:text]}" }.join("\n")
   end
 
-  def input
+  def input(prompt = nil)
+    puts prompt unless prompt.nil?
     gets.chomp
   end
 
@@ -93,11 +107,14 @@ class ConsoleInterface
     objs.each_with_index { |obj, i| puts "#{i} - #{obj.inspect}" }
   end
 
-  def pick_obj(objs)
+  def pick_obj(objs, prompt = 'Введите номер')
     show(objs)
-    puts 'Введите номер'
+    puts prompt
     index = input.to_i
-    return unless (0...objs.size).include?(index)
+    unless (0...objs.size).include?(index)
+      puts 'Такого номера нет'
+      return pick_obj(objs, prompt)
+    end
 
     objs.at(index)
   end
@@ -126,8 +143,8 @@ class ConsoleInterface
   end
 
   def create_station
-    puts 'Введите название станции'
-    station = Station.new(input.capitalize)
+    name = input('Введите название станции').capitalize
+    station = Station.new(name)
     stations << station
     puts "Станция #{station.inspect} успешно создана" if station.valid?
   rescue ArgumentError => e
@@ -145,15 +162,14 @@ class ConsoleInterface
   end
 
   def create_train
-    puts 'Введите номер поезда в формате "а12-z1" или "а12я1"'
-    number = input
-    puts "Введите тип поезда:\n#{create(type_menu)}"
-    command = input
-    return unless type_menu.key?(command)
+    number = input('Введите номер поезда в формате "а12-z1" или "а12я1"')
+    command = input("Введите тип поезда:\n#{create(train_type_menu)}")
+    return unless train_type_menu.key?(command)
 
-    train = type_menu.dig(command, :class).new(number)
+    train = train_type_menu.dig(command, :class).new(number)
+    trains << train
 
-    puts "Поезд #{train.inspect} успешно создан" if train.valid?
+    puts "Поезд #{train_info(train)} успешно создан" if train.valid?
   rescue ArgumentError => e
     puts e.message
     retry
@@ -162,13 +178,10 @@ class ConsoleInterface
   def create_route
     return puts 'В базе не достаточно станций для создания маршрута' if stations.size < NEED_STATIONS_FOR_ROUTE
 
-    puts 'Для создания маршрута введите через пробел номера двух станций:'
-    show(stations)
+    first_station = pick_obj(stations, 'Введите номер станции начала маршрута')
+    last_station = pick_obj(stations, 'Введите номер конца маршрута')
 
-    start_index, finish_index = input.split.map(&:to_i)
-    return create_route if finish_index.nil?
-
-    route = Route.new(stations[start_index], stations[finish_index])
+    route = Route.new(first_station, last_station)
     routes << route
     puts "Маршрут #{route.inspect} успешно создан" if route.valid?
   rescue ArgumentError => e
@@ -193,9 +206,9 @@ class ConsoleInterface
     return if objs.empty?
 
     obj = pick_obj(objs)
-    p obj
-    puts create(objs_menu)
-    command = input
+    puts obj.inspect
+
+    command = input(create(objs_menu))
     return unless objs_menu.key?(command)
 
     send_action(command, objs_menu, obj)
@@ -210,13 +223,18 @@ class ConsoleInterface
   end
 
   def add_wagon(train)
-    wagon = case train.type
-            when :cargo
-              create_wagon('Введите объем вагона', CargoWagon)
-            when :passenger
-              create_wagon('Введите количество мест', PassengerWagon)
-            end
-    train.add_wagon(wagon)
+    train.add_wagon(create_wagon(train.type))
+  end
+
+  def create_wagon(type)
+    typeclass, space_prompt = create_wagon_types[type]
+    space = input(space_prompt).to_i
+    wagon = typeclass.new(space)
+    puts "Создан новый вагон: #{wagon_info(wagon)}"
+    wagon
+  rescue ArgumentError => e
+    puts e.error
+    retry
   end
 
   def delete_wagon(train)
@@ -235,23 +253,13 @@ class ConsoleInterface
     train.go_backward
   end
 
-  def create_wagon(space_prompt, typeclass)
-    puts space_prompt
-    space = input.to_i
-    wagon = typeclass.new(space)
-    puts "Создан новый вагон: #{wagon_info(wagon)}"
-    wagon
-  rescue ArgumentError => e
-    puts e.error
-    retry
-  end
-
   def train_info(train)
     "#{train.number}, #{train.class::TYPE}, #{train.wagons.size} вагонов"
   end
 
   def wagon_info(wagon)
-    "#{wagon.class::TYPE}, свободно #{wagon.free_place}, занято #{wagon.used_place} #{wagon.class::UNIT}"
+    "#{wagon.class::TYPE}, свободно #{wagon.free_place}, " \
+    "занято #{wagon.used_place} #{wagon.class::UNIT}"
   end
 
   def show_wagons(train)
@@ -264,11 +272,8 @@ class ConsoleInterface
 
   def use_wagon(train)
     wagon = pick_obj(train.wagons)
-
-    case wagon.type
-    when :cargo then take_volume(wagon)
-    when :passenger then take_seat(wagon)
-    end
+    action = use_wagon_actions_by[wagon.type]
+    send(action, wagon)
   end
 
   def take_seat(wagon)
@@ -279,8 +284,10 @@ class ConsoleInterface
   end
 
   def take_volume(wagon)
-    puts "Свободно #{wagon.free_place}#{wagon.class::UNIT}. Введите нужный объем"
-    volume = input.to_i
+    volume =
+      input(
+        "Свободно #{wagon.free_place}#{wagon.class::UNIT}. Введите нужный объем"
+      ).to_i
 
     wagon.take_place(volume)
 

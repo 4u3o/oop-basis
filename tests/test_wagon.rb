@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/nameable'
 require_relative '../lib/wagon'
 require 'test/unit'
@@ -12,6 +14,4 @@ class TestWagon < Test::Unit::TestCase
     assert_equal(10, @wagon.free_place)
     assert_equal(0, @wagon.used_place)
   end
-
-  
 end

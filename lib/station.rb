@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Station
   include InstanceCounter
   include Validateable
@@ -36,8 +38,8 @@ class Station
     trains.filter { |train| train.type == type }
   end
 
-  def each_train
-    trains.each { |train| yield train }
+  def each_train(&block)
+    trains.each { |train| block.call(train) }
   end
 
   private
