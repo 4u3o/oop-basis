@@ -182,7 +182,7 @@ class ConsoleInterface
     last_station = pick_obj(stations, 'Введите номер конца маршрута')
     route = Route.new(first_station, last_station)
     routes << route
-    puts "Маршрут #{route.inspect} успешно создан" if route.valid?
+    puts "Маршрут #{route.inspect} успешно создан"
   rescue ArgumentError => e
     puts e.message
     retry

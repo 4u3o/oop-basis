@@ -2,9 +2,13 @@
 
 class Station
   include InstanceCounter
-  include Validateable
+  include Validation
+  extend Accessors
 
   attr_reader :trains
+
+  strong_attr_accessor :name, String
+  validate :name, :presence
 
   @stations = []
   @counter = 0
@@ -40,13 +44,5 @@ class Station
 
   def each_train(&block)
     trains.each { |train| block.call(train) }
-  end
-
-  private
-
-  attr_reader :name
-
-  def validate!
-    raise ArgumentError, 'Имя не может быть пустым' if name.empty?
   end
 end

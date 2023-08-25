@@ -2,7 +2,6 @@
 
 class Route
   include InstanceCounter
-  include Validateable
 
   ADDING_INDEX = -2
 
@@ -12,8 +11,6 @@ class Route
 
   def initialize(start, finish)
     @stations = [start, finish]
-
-    validate!
 
     register_instance
   end
@@ -32,11 +29,5 @@ class Route
 
   def any_station_before?(station)
     !index(station).pred.negative?
-  end
-
-  private
-
-  def validate!
-    raise ArgumentError, 'Станции должны быть разными' if stations.first == stations.last
   end
 end

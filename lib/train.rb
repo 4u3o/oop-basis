@@ -3,10 +3,15 @@
 class Train
   include Nameable
   include InstanceCounter
-  include Validateable
+  include Validation
+  extend Accessors
 
-  attr_accessor :speed
-  attr_reader :station, :wagons, :type, :number
+  attr_reader :station, :wagons, :type, :number, :speed
+
+  NUMBER_FORMAT = /^[a-zа-я0-9]{3}-?[a-zа-я0-9]{2}$/i
+
+  validate :number, :presence
+  validate :number, :format, NUMBER_FORMAT
 
   @@trains = []
   @counter = 0
@@ -70,14 +75,7 @@ class Train
 
   protected
 
-  NUMBER_FORMAT = /^[a-zа-я0-9]{3}-?[a-zа-я0-9]{2}$/i
-
   attr_reader :route
-  attr_writer :station
-
-  def validate!
-    raise ArgumentError, 'Неверный формат' if number !~ NUMBER_FORMAT
-  end
 
   def next_station
     route.stations.at(route.index(station).next)
