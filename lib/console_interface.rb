@@ -180,7 +180,6 @@ class ConsoleInterface
 
     first_station = pick_obj(stations, 'Введите номер станции начала маршрута')
     last_station = pick_obj(stations, 'Введите номер конца маршрута')
-
     route = Route.new(first_station, last_station)
     routes << route
     puts "Маршрут #{route.inspect} успешно создан" if route.valid?
@@ -259,7 +258,7 @@ class ConsoleInterface
 
   def wagon_info(wagon)
     "#{wagon.class::TYPE}, свободно #{wagon.free_place}, " \
-    "занято #{wagon.used_place} #{wagon.class::UNIT}"
+      "занято #{wagon.used_place} #{wagon.class::UNIT}"
   end
 
   def show_wagons(train)
