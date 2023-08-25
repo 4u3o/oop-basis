@@ -6,6 +6,7 @@ class TestAccessor < Test::Unit::TestCase
     extend Accessors
 
     attr_accessor_with_history :name
+    strong_attr_accessor :age, Integer
   end
 
   def setup
@@ -22,5 +23,17 @@ class TestAccessor < Test::Unit::TestCase
 
     @bar.name = 1
     assert_equal(['test', 1], @bar.name_history)
+  end
+
+  def test_strong_attr_accessor
+    assert_raise(ArgumentError) do
+      @bar.age = '1'
+    end
+
+    assert_nothing_raised do
+      @bar.age = 1
+    end
+
+    assert_equal(1, @bar.age)
   end
 end

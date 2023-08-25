@@ -13,4 +13,14 @@ module Accessors
       end
     end
   end
+
+  def strong_attr_accessor(sym, klass)
+    define_method(sym) { instance_variable_get("@#{sym}") }
+
+    define_method("#{sym}=") do |value|
+      raise ArgumentError, 'Не подходящий тип переменной' unless value.is_a? klass
+
+      instance_variable_set("@#{sym}", value)
+    end
+  end
 end
